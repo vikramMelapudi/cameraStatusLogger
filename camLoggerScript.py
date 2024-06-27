@@ -133,6 +133,9 @@ if __name__ == '__main__':
     print(logName, en)
     offstHrs = 5
 
+    os.makedirs(utils.baseDir+'logs/', exist_ok=True)
+    os.makedirs(utils.baseDir+'report/', exist_ok=True)
+
     if True:
         gres = []
         gres = cutils.getCamLogsByTrip(selCNames, en=en, offstHrs=offstHrs, gres=gres)
