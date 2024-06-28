@@ -2,9 +2,18 @@ import utilsCamLogs as cutils
 from importlib import reload
 reload(cutils)
 from datetime import datetime, timedelta
-import json
+import json, os, sys
 import numpy as np
 import matplotlib.pyplot as plt
+
+config = {
+    'nCams': -1,
+    'makeOnlyReport': ''
+}
+def getConfig(k, default=None):
+    if k not in config:
+        return default
+    return config[k]
 
 def makeTimePlots(gres, mapCamVidPlateAc):
     tags = {}
@@ -69,7 +78,9 @@ def getDFByState(camSumm):
 
         if k not in grps:
             grps[k] = []
-        grps[k].append(df.iloc[n]['name'])
+        cname = df.iloc[n]['name']
+        plate = cutils.mapCamVidPlateAc[cname]['plate']
+        grps[k].append(cname if len(plate)==0 else plate)
     grpDF = pd.DataFrame()
     for grp in grps:
         ldf = pd.DataFrame(grps[grp])
@@ -117,12 +128,14 @@ selCNames = list(mapCamVidPlateAc.keys())
 import sys
 if __name__ == '__main__':
     cutils.log('started run ', 'w')
-
+    
     if len(sys.argv)>1:
-        n = int(sys.argv[1])
-        if n>0:
-            selCNames = selCNames[:n]
-            print(selCNames)
+        config = json.load(open(sys.argv[1],'r'))
+
+    nCam = getConfig('nCam',-1)
+    if nCam>0:
+        selCNames = selCNames[:nCam]
+        print(selCNames)
     
     gmtDelta = cutils.timedelta(seconds=5*3600+30*60)
     tim = cutils.datetime.now()
@@ -133,10 +146,11 @@ if __name__ == '__main__':
     print(logName, en)
     offstHrs = 5
 
-    os.makedirs(utils.baseDir+'logs/', exist_ok=True)
-    os.makedirs(utils.baseDir+'report/', exist_ok=True)
+    os.makedirs(cutils.baseDir+'logs/', exist_ok=True)
+    os.makedirs(cutils.baseDir+'report/', exist_ok=True)
 
-    if True:
+    makeOnlyReport = getConfig('makeOnlyReport','')
+    if len(makeOnlyReport)==0:
         gres = []
         gres = cutils.getCamLogsByTrip(selCNames, en=en, offstHrs=offstHrs, gres=gres)
 
@@ -148,6 +162,7 @@ if __name__ == '__main__':
     
     else:
         import pandas as pd
+        logName = makeOnlyReport
         camMetrics = pd.read_csv(cutils.baseDir+'logs/df_%s.csv'%logName, index_col=0)
         camSumm = pd.read_csv(cutils.baseDir+'logs/summ_%s.csv'%logName, index_col=0)
     

@@ -10,7 +10,7 @@ import os, sys, glob, json
 from datetime import datetime
 from datetime import timedelta
 
-baseDir = '/home/ubuntu/vikram/CameraStatus/'
+baseDir = '/home/ubuntu/vikram/cameraStatusLogger/'
 logFile = baseDir+'log.txt'
 
 brahmaURL = 'https://apis.intangles.com/idevice/logsV2/{cname}?psize=10000&token=JBRHjp1tPFdyZwvRGblGwi-hIv5OmYu-cr--qzRE9rSCY6F1M5vxQt5Y7Wn9g7ur&'
